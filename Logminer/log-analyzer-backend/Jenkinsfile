@@ -1,0 +1,107 @@
+pipeline {
+  agent any
+
+  environment {
+    DB_URL = 'jdbc:postgresql://host.docker.internal:5432/log_miner'
+    DB_USERNAME = 'postgres'
+    DB_PASSWORD = 'f56724'
+    PORT = '8080'
+    ISSUER_URI = 'https://login.microsoftonline.com/feb7950e-f92a-4705-ad14-851271a1e0e7/v2.0'
+    CLIENT_ID = 'aad31e0a-08bf-4f4a-a108-18afdedb340e'
+    CLIENT_SECRET = 'WS_8Q~pX1xUWWcEOPFy4aLX6rF0XlB-lUtDaxaza'
+
+    RAG_URL = 'http://localhost:8000/rag/parse'
+    HINT_URL = 'http://localhost:8000/hint/gen'
+    SECRET_KEY = 'MaSuperCleUltraSecre'
+    SEND_MAIL_FROM = 'log.miner.org@gmail.com'
+    MAIL_APP_PASSWORD = 'xdnkxuamoyagtljn'
+
+    REDIS_HOST = 'host.docker.internal'
+    REDIS_PORT = '6379'
+    SILENCE_ALERT_MAIL_MINUTES = '60'
+    SONARQUBE_ENV = 'MySonarQube'
+  }
+
+  options {
+    // Supprime les builds plus anciens que 10 pour éviter l'encombrement
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+    // Timeout général pour éviter les jobs bloqués
+    timeout(time: 10, unit: 'MINUTES')
+    // Marque les logs de chaque étape clairement
+    timestamps()
+  }
+
+  stages {
+    stage('Clone') {
+      steps {
+        git url: 'https://github.com/mohamed-ayedi/log-analyzer-backend.git',
+            branch: 'main',
+            credentialsId: 'github_token1'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'chmod +x mvnw'
+        sh './mvnw clean package -DskipTests'
+      }
+    }
+
+    stage('SonarQube Analysis') {
+  steps {
+    withSonarQubeEnv('MySonarQube') {
+      sh '''
+        export PATH=$PATH:/opt/sonar-scanner/bin
+        sonar-scanner \
+          -Dsonar.projectKey=log-analyzer-backend \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=http://sonarqube:9000 \
+          -Dsonar.login=$SONAR_AUTH_TOKEN \
+          -Dsonar.java.binaries=target/classes
+      '''
+    }
+  }
+}
+
+
+    stage('Test') {
+      steps {
+         sh './mvnw test -DfailIfNoTests=false'
+      }
+      post {
+        always {
+          junit '**/target/surefire-reports/*.xml' // Publie les résultats de test
+        }
+      }
+    }
+
+
+    stage('Run Application') {
+      steps {
+        echo 'Lancement de l\'application Spring Boot...'
+        sh 'nohup java -jar target/*.jar > app.log 2>&1 &'
+      }
+    }
+  }
+
+post {
+  failure {
+    echo '❌ Le build a échoué.'
+
+    emailext(
+      subject: "❌ Échec du build Jenkins: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+      body: """Le build a échoué.
+Consulter les logs ici : ${env.BUILD_URL}
+""",
+      to: 'admin@example.com',
+      from: "${env.SEND_MAIL_FROM}",
+      mimeType: 'text/plain'
+    )
+  }
+
+  success {
+    echo '✅ Build terminé avec succès.'
+  }
+}
+
+}

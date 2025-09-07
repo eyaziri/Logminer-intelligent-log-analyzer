@@ -1,0 +1,91 @@
+pipeline {
+  agent any
+
+  tools {
+    nodejs 'Node_20' // Configure dans Jenkins > Global Tool Configuration
+  }
+
+  environment {
+    NODE_VERSION = '18.20.2'
+    NEXT_PUBLIC_CLIENT_ID = 'aad31e0a-08bf-4f4a-a108-18afdedb340e'
+    NEXT_PUBLIC_CLIENT_SECRET = 'WS_8Q~pX1xUWWcEOPFy4aLX6rF0XlUtDaxaza'
+    NEXT_PUBLIC_REDIRECT_URI = 'http://localhost:3000/login'
+    NEXT_PUBLIC_SCOPE = 'api://aad31e0a-08bf-4f4a-a108-18afdedb340e/logminer'
+    NEXT_PUBLIC_AUTH_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize'
+    NEXT_PUBLIC_TOKEN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
+    NEXT_PUBLIC_API_URL = 'http://localhost:8080'
+    NEXT_PUBLIC_AUTHORITY = 'https://login.microsoftonline.com/feb7950e-f92a-4705-ad14-851271a1e0e7'
+    NEXT_PUBLIC_SCOPES = 'openid profile offline_access api://aad31e0a-08bf-4f4a-a108-18afdedb340e/logminer'
+    NEXT_PUBLIC_WS_URL = 'http://localhost:8080/ws-logs'
+  }
+
+  stages {
+    stage('Clean Workspace') {
+      steps {
+        deleteDir()
+      }
+    }
+
+    stage('Clone') {
+      steps {
+        git url: 'https://github.com/mohamed-ayedi/log-analyzer-frontend.git',
+            branch: 'main',
+            credentialsId: 'github_token1'
+      }
+    }
+
+    stage('Install Dependencies') {
+      steps {
+        sh '''
+          npm install
+
+          # ✅ Assurer les dépendances nécessaires pour les tests (par sécurité)
+          npm install --save-dev jest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
+        '''
+      }
+    }
+
+    stage('Install test dependencies') {
+      steps {
+        sh '''
+          npm install --save-dev jest \
+            jest-environment-jsdom \
+            @testing-library/react \
+            @testing-library/jest-dom \
+            @testing-library/user-event
+        '''
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'npm run build'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'npx jest --env=jest-environment-jsdom --passWithNoTests'
+      }
+    }
+    
+    stage('Deploy') {
+      steps {
+        echo 'Déploiement frontend localement...'
+        sh 'npm start &'
+      }
+    }
+  }
+
+  post {
+    success {
+      echo '✅ Build et déploiement réussis.'
+    }
+    failure {
+      echo '❌ Échec du pipeline.'
+    }
+    always {
+      cleanWs()
+    }
+  }
+}
