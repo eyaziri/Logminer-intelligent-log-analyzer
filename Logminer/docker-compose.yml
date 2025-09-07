@@ -28,11 +28,11 @@ services:
     environment:
       - DB_URL=jdbc:postgresql://host.docker.internal:5432/log_miner
       - DB_USERNAME=postgres
-      - DB_PASSWORD=f56724
+      - DB_PASSWORD=${DB_PASSWORD}
+      - CLIENT_SECRET=${CLIENT_SECRET}
       - PORT=8080
       - ISSUER_URI=https://login.microsoftonline.com/feb7950e-f92a-4705-ad14-851271a1e0e7/v2.0
       - CLIENT_ID=aad31e0a-08bf-4f4a-a108-18afdedb340e
-      - CLIENT_SECRET=WS_8Q~pX1xUWWcEOPFy4aLX6rF0XlB-lUtDaxaza
 
       - RAG_URL=http://localhost:8000/rag/parse
       - HINT_URL=http://localhost:8000/hint/gen
