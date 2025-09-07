@@ -1,0 +1,5 @@
+docker run -d --name sonarqube -p 9000:9000 sonarqube:lts
+
+SonarQube sera accessible sur http://localhost:9000
+
+Le login/mot de passe par défaut est admin / f56724 (à changer après la première connexion)

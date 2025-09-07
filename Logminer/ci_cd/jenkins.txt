@@ -1,0 +1,19 @@
+lancer manuellement docker (docker desktop)
+
+pour creer un nouveau jenkens :
+
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+
+
+pour demarer un jenkins deja existant :
+
+docker stop jenkins
+
+
+docker start jenkins
+
+
+
+
+
+http://localhost:8080/

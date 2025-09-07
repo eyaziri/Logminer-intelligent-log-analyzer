@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: ./log-analyzer-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8080
+      - NEXT_PUBLIC_CLIENT_ID=aad31e0a-08bf-4f4a-a108-18afdedb340e
+      - NEXT_PUBLIC_CLIENT_SECRET=WS_8Q~pX1xUWWcEOPFy4aLX6rF0XlB-lUtDaxaza
+      - NEXT_PUBLIC_REDIRECT_URI=http://localhost:3000/login
+      - NEXT_PUBLIC_SCOPE=api://aad31e0a-08bf-4f4a-a108-18afdedb340e/logminer
+      - NEXT_PUBLIC_AUTH_URL=https://login.microsoftonline.com/common/oauth2/v2.0/authorize
+      - NEXT_PUBLIC_TOKEN_URL=https://login.microsoftonline.com/common/oauth2/v2.0/token
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_AUTHORITY=https://login.microsoftonline.com/feb7950e-f92a-4705-ad14-851271a1e0e7
+      - NEXT_PUBLIC_SCOPES=openid profile offline_access api://aad31e0a-08bf-4f4a-a108-18afdedb340e/logminer
+      - NEXT_PULIC_WS_URL=http://localhost:8080/ws-logs
+      
+    depends_on:
+      - backend
+
+  backend:
+    build: ./log-analyzer-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5432/log_miner
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=f56724
+      - PORT=8080
+      - ISSUER_URI=https://login.microsoftonline.com/feb7950e-f92a-4705-ad14-851271a1e0e7/v2.0
+      - CLIENT_ID=aad31e0a-08bf-4f4a-a108-18afdedb340e
+      - CLIENT_SECRET=WS_8Q~pX1xUWWcEOPFy4aLX6rF0XlB-lUtDaxaza
+
+      - RAG_URL=http://localhost:8000/rag/parse
+      - HINT_URL=http://localhost:8000/hint/gen
+
+      - SEND_MAIL_FROM=log.miner.org@gmail.com
+      - MAIL_APP_PASSWORD=xdnkxuamoyagtljn
+
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - SILENCE_ALERT_MAIL_MINUTES=60
+      
+    depends_on:
+      - ai
+
+  ai:
+    build: ./log-analyzer-ai
+    ports:
+      - "8000:8000"

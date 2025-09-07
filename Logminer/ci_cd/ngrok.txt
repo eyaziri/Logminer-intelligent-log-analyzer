@@ -1,0 +1,18 @@
+ngrok config add-authtoken 2tIrvozB1Qn68ZXIiCQ5qhImlJj_6A8pMfhVJzRUYmETPNdjG
+
+token nekthou mel lien hetha : https://dashboard.ngrok.com/get-started/your-authtoken
+
+mconnectya automatiquement b email eyaziri2@gmail.com
+
+nkhademha b : ngrok http 8080
+
+
+CMD :
+
+
+ngrok config add-authtoken 2tIrvozB1Qn68ZXIiCQ5qhImlJj_6A8pMfhVJzRUYmETPNdjG
+
+
+
+ngrok http 8080
+
