@@ -51,16 +51,15 @@ AI Module (Python)
 ```bash
 uvicorn controller:app --reload
 chainlit src/chatbot/chatbot.py -w
----
-
+```
 **Setup:**
-
+```bash
 python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
----
+```
 
-###🔹 Backend (Spring Boot)
+### 🔹 Backend (Spring Boot)
 
 REST APIs for log upload, search, and filtering
 
@@ -82,7 +81,7 @@ service/     → Business logic
 model/       → Entities & DTOs  
 repository/  → Database access  
 
-###🔹 Frontend (Next.js)
+### 🔹 Frontend (Next.js)
 
 Upload and visualize logs
 
@@ -93,13 +92,13 @@ Interactive filters and charts
 Secure login via Azure OAuth
 
 **Run locally:**
-
+``` bash
 git clone https://github.com/mohamed-ayedi/log-analyzer-frontend.git
 cd log-analyzer-frontend
 cp .env.example .env
 npm install
 npm run dev
-
+```
 
 App available at → http://localhost:3000
 
@@ -109,30 +108,21 @@ Frontend	Backend	REST API	Upload logs, query data
 Backend	AI Module	HTTP	Send logs for analysis
 AI Module	LLM	API	Generate explanations
 
-###🌟 Features
+### 🌟 Features
 
-Automatic log parsing & anomaly detection
+- Automatic log parsing & anomaly detection
 
-AI-based error explanations and fixes
+- AI-based error explanations and fixes
 
-Natural language “Ask-Why” assistant
+- Natural language “Ask-Why” assistant
 
-Visual dashboards with real-time KPIs
+- Visual dashboards with real-time KPIs
 
 ### 👥 Authors
 
-AI & NLP: LogAI Team
+- AI & NLP: LogAI Team
 
-Backend: LogMiner Team
+- Backend: LogMiner Team
 
-Frontend: LogAnalyzer Team
+- Frontend: LogAnalyzer Team
 
-### 📦 Future Enhancements
-
-Real-time log streaming (WebSocket)
-
-Auto-clustering of anomalies
-
-Dockerized full deployment
-
-Role-based access control
