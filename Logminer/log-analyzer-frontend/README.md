@@ -86,8 +86,4 @@ npm run dev
 
 The app should now be running at:
 📍 http://localhost:3000
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 85eb030e6723a14bdf81557ab0330e449877ee85
